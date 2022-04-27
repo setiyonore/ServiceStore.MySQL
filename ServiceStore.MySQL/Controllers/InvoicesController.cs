@@ -3,9 +3,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestSharp;
+using RestSharp.Authenticators;
 using ServiceStore.Data;
 using ServiceStore.Models;
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ServiceStore.MySQL.DataTransferObejct;
 namespace ServiceStore.MySQL.Controllers
 {
     [Route("api/[controller]")]
@@ -13,21 +16,19 @@ namespace ServiceStore.MySQL.Controllers
     public class InvoicesController : ControllerBase
     {
         private readonly ServiceStoreContext _context;
-
         public InvoicesController(ServiceStoreContext context)
         {
             _context = context;
         }
         [HttpGet("countCost")]
-        public Task<RestResponse> countCost()
+        public async Task<IActionResult> countCost()
         {
-            var client = new RestClient("https://api.rajaongkir.com/starter/cost");
-            var request = new RestRequest("",Method.Post);
-            request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
-            request.AddHeader("content-type", "application/x-www-form-urlencoded");
-            request.AddParameter("application/x-www-form-urlencoded", "origin=501&destination=114&weight=1700&courier=jne", ParameterType.RequestBody);
-            var response = client.ExecuteAsync(request);
-            return response;
+           var  _client = new RestClient("https://reqres.in/");
+           var request = new RestRequest("api/users");
+           var response = await _client.ExecuteGetAsync(request);
+            var userList = JsonSerializer.Deserialize<UserList>(response.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return Ok(userList.Data);
+
         }
         [HttpGet("generateNoInvoice")]
         public string GenerateNoInvoice()
