@@ -27,7 +27,7 @@ namespace ServiceStore.MySQL.Controllers
            var request = new RestRequest("api/users");
            var response = await _client.ExecuteGetAsync(request);
             var userList = JsonSerializer.Deserialize<UserList>(response.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            return Ok(userList.Data);
+            return Ok(userList);
 
         }
         [HttpGet("generateNoInvoice")]

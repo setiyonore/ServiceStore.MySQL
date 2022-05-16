@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RestSharp;
+using Newtonsoft.Json;
+using System.Text;
 using System.Text.Json;
 using ServiceStore.MySQL.DataTransferObejct;
 
@@ -18,9 +20,8 @@ namespace ServiceStore.MySQL.Controllers
             request.AddHeader("Content-Type", "application/json");
             request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
             var response = await _client.ExecuteGetAsync(request);
-            var province = JsonSerializer.Serialize(response.Content);
-            //var province =  JsonSerializer.Deserialize<ProvinceList>(response.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            return Ok(province);
+            var provinceList = JsonConvert.DeserializeObject<Province>(response.Content);
+            return Ok(provinceList);
 
         }
 

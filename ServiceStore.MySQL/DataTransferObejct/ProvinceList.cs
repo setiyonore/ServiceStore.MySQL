@@ -2,6 +2,7 @@
 {
     public class ProvinceList
     {
-        public List<Province> Data { get; set; }
+        public List<Province> results { get; set; }
+        
     }
 }
