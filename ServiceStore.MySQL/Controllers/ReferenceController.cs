@@ -37,5 +37,17 @@ namespace ServiceStore.MySQL.Controllers
             return Ok(cityList);
         }
 
+        [HttpPost("getCost")]
+        public async Task<IActionResult> GetCost()
+        {
+            var client = new RestClient("https://api.rajaongkir.com/starter");
+            var request = new RestRequest("/cost",Method.Post);
+            request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
+            request.AddHeader("content-type", "application/x-www-form-urlencoded");
+            request.AddParameter("application/x-www-form-urlencoded", "origin=501&destination=114&weight=1700&courier=jne", ParameterType.RequestBody);
+            var response = await client.ExecutePostAsync(request);
+            return Ok(response.Content);
+        }
+
     }
 }
