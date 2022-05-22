@@ -38,15 +38,21 @@ namespace ServiceStore.MySQL.Controllers
         }
 
         [HttpPost("getCost")]
-        public async Task<IActionResult> GetCost()
+        public async Task<IActionResult> GetCost(string origin, string destination, int weight,string courier)
         {
+            
             var client = new RestClient("https://api.rajaongkir.com/starter");
             var request = new RestRequest("/cost",Method.Post);
             request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
-            request.AddHeader("content-type", "application/x-www-form-urlencoded");
-            request.AddParameter("application/x-www-form-urlencoded", "origin=501&destination=114&weight=1700&courier=jne", ParameterType.RequestBody);
-            var response = await client.ExecutePostAsync(request);
-            return Ok(response.Content);
+            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+            //request.AddParameter("application/x-www-form-urlencoded", "origin=501&destination=114&weight=1700&courier=jne", ParameterType.RequestBody);
+            request.AddParameter("origin", origin);
+            request.AddParameter("destination", destination);
+            request.AddParameter("weight", weight);
+            request.AddParameter("courier", courier);
+            var response = await client.ExecuteAsync(request);
+            var costList = JsonConvert.DeserializeObject<Cost>(response.Content);
+            return Ok(costList);
         }
 
     }
