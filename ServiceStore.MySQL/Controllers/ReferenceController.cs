@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RestSharp;
 using Newtonsoft.Json;
-using System.Text;
-using System.Text.Json;
 using ServiceStore.MySQL.DataTransferObejct;
 
 namespace ServiceStore.MySQL.Controllers
@@ -38,7 +36,7 @@ namespace ServiceStore.MySQL.Controllers
         }
 
         [HttpPost("getCost")]
-        public async Task<IActionResult> GetCost(string origin, string destination, int weight,string courier)
+        public async Task<IActionResult> GetCost(FormatterRequest.Cost cost)
         {
             
             var client = new RestClient("https://api.rajaongkir.com/starter");
@@ -46,10 +44,10 @@ namespace ServiceStore.MySQL.Controllers
             request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             //request.AddParameter("application/x-www-form-urlencoded", "origin=501&destination=114&weight=1700&courier=jne", ParameterType.RequestBody);
-            request.AddParameter("origin", origin);
-            request.AddParameter("destination", destination);
-            request.AddParameter("weight", weight);
-            request.AddParameter("courier", courier);
+            request.AddParameter("origin", cost.origin);
+            request.AddParameter("destination", cost.destination);
+            request.AddParameter("weight", cost.weight);
+            request.AddParameter("courier", cost.courier);
             var response = await client.ExecuteAsync(request);
             var costList = JsonConvert.DeserializeObject<Cost>(response.Content);
             return Ok(costList);
