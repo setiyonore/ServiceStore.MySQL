@@ -20,11 +20,18 @@ builder.Services.AddDbContext<ServiceStoreContext>(
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
+
+// TODO: DIBACA DULU!
+// if put swagger outside conditional check
+// it will also deploy on production
+// so comment it before deploy to production
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

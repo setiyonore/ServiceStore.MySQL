@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  serviceStore:
+    container_name: ServiceStore
+    image: service-store
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT}:80
+      - ${SWAGGER_PORT}:44319
+    depends_on:
+      - "mariadb"
+  mariadb:
+    image: mariadb:10.2
+    environment:
+      MYSQL_ROOT_PASSWORD: 1550
+      MYSQL_DATABASE: servicestore
+      MYSQL_USER: kai
+      MYSQL_PASSWORD: 1550
+    restart: on-failure
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+     - ${PWD}/mariadb:/var/lib/mysql
