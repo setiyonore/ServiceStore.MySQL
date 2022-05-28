@@ -18,6 +18,7 @@ namespace ServiceStore.Data
         }
 
         public virtual DbSet<Invoice> Invoices { get; set; } = null!;
+        public virtual DbSet<Transaction> Transactions { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,13 +29,11 @@ namespace ServiceStore.Data
             {
                 entity.ToTable("invoice");
 
-                entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("id");
+                entity.UseCollation("utf8mb4_0900_ai_ci");
 
-                entity.Property(e => e.CityId)
-                    .HasColumnType("int(3)")
-                    .HasColumnName("city_id");
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.CityId).HasColumnName("city_id");
 
                 entity.Property(e => e.Date)
                     .HasColumnType("datetime")
@@ -48,9 +47,7 @@ namespace ServiceStore.Data
                     .HasMaxLength(25)
                     .HasColumnName("payment_status");
 
-                entity.Property(e => e.ProvinceId)
-                    .HasColumnType("int(3)")
-                    .HasColumnName("province_id");
+                entity.Property(e => e.ProvinceId).HasColumnName("province_id");
 
                 entity.Property(e => e.ShippingAddress)
                     .HasColumnType("text")
@@ -64,9 +61,46 @@ namespace ServiceStore.Data
                     .HasMaxLength(100)
                     .HasColumnName("total_price");
 
-                entity.Property(e => e.UserId)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("user_id");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+            });
+
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.ToTable("transaction");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.AmountProductsPrice).HasColumnName("amount_products_price");
+
+                entity.Property(e => e.CityId)
+                    .HasMaxLength(50)
+                    .HasColumnName("city_id");
+
+                entity.Property(e => e.Date)
+                    .HasColumnType("datetime")
+                    .HasColumnName("date");
+
+                entity.Property(e => e.InvoiceCode)
+                    .HasMaxLength(100)
+                    .HasColumnName("invoice_code");
+
+                entity.Property(e => e.PaymentStatus)
+                    .HasMaxLength(100)
+                    .HasColumnName("payment_status");
+
+                entity.Property(e => e.ProvinceId)
+                    .HasMaxLength(50)
+                    .HasColumnName("province_id");
+
+                entity.Property(e => e.ShippingAddress)
+                    .HasMaxLength(100)
+                    .HasColumnName("shipping_address");
+
+                entity.Property(e => e.ShippingCost).HasColumnName("shipping_cost");
+
+                entity.Property(e => e.TotalPrice).HasColumnName("total_price");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
             });
 
             OnModelCreatingPartial(modelBuilder);
