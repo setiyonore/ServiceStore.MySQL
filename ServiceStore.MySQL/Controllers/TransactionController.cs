@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using ServiceStore.MySQL.FormatterRequest;
 using ServiceStore.Data;
 using ServiceStore.Models;
+using ServiceStore.MySQL.DataTransferObejct;
 
 namespace ServiceStore.MySQL.Controllers;
 
@@ -17,7 +18,7 @@ public class TransactionController : ControllerBase
         _context = context;
     }
     [HttpGet("{id}")]
-    public async Task<ActionResult<Transaction>> GetTransaction(int id)
+    public async Task<ActionResult<TransactionResponse>> GetTransaction(int id)
     {
         var transaction = await _context.Transactions.FindAsync(id);
 
@@ -25,7 +26,10 @@ public class TransactionController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(transaction);
+
+        var data = JsonConvert.SerializeObject(transaction);
+        var result = JsonConvert.DeserializeObject<TransactionResponse>(data);
+        return result;
     }
     [HttpGet("generateNoInvoice")]
     public string GenerateNoInvoice()
@@ -67,7 +71,37 @@ public class TransactionController : ControllerBase
         data.UserId = 4;
         _context.Transactions.Add(data);
         await _context.SaveChangesAsync();
-        return CreatedAtAction("GetTransaction",new {id = data.Id},data);
+        //get data transaction
+        var transaction = await _context.Transactions.FindAsync(data.Id);
+        if (transaction == null)
+        {
+            return NotFound();
+        }
+        DateTime date = DateTime.Now;
+        string dateFinal = date.ToString("dd/M/yyyy");
+        var result = new
+        {
+            meta = new
+            {
+                message = "Transaction  Success",
+                code = 200,
+                status = "success"
+            },
+            data = new
+            {
+                user_id = transaction.Id,
+                date = dateFinal,
+                invoice_code = transaction.InvoiceCode,
+                shipping_cost = transaction.ShippingCost,
+                amount_products_price = transaction.AmountProductsPrice,
+                total_price = transaction.TotalPrice,
+                shipping_address = transaction.ShippingAddress,
+                province_id = transaction.ProvinceId,
+                city_id = transaction.CityId,
+                payment_status = transaction.PaymentStatus
+            }
+        };
+        return Ok(result);
 
     }
 
