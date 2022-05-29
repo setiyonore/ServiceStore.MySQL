@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ServiceStore.MySQL.FormatterRequest;
 using ServiceStore.Data;
@@ -30,6 +31,33 @@ public class TransactionController : ControllerBase
         var data = JsonConvert.SerializeObject(transaction);
         var result = JsonConvert.DeserializeObject<TransactionResponse>(data);
         return result;
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult> PutTransaction(int id, Transaction transaction)
+    {
+        if (id != transaction.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(transaction).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(DbUpdateConcurrencyException)
+        {
+            if (!TransactionExist(id))
+            {
+                return NotFound();
+            }
+
+            throw;
+        }
+
+        return NoContent();
     }
     [HttpGet("generateNoInvoice")]
     public string GenerateNoInvoice()
@@ -103,6 +131,11 @@ public class TransactionController : ControllerBase
         };
         return Ok(result);
 
+    }
+
+    private bool TransactionExist(int id)
+    {
+        return _context.Transactions.Any(e => e.Id == id);
     }
 
 }
