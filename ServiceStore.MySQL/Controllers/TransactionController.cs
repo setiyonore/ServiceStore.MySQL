@@ -89,7 +89,7 @@ public class TransactionController : ControllerBase
             },
             data = new
             {
-                user_id = transaction.Id,
+                user_id = transaction.UserId,
                 date = dateFinal,
                 invoice_code = transaction.InvoiceCode,
                 shipping_cost = transaction.ShippingCost,
