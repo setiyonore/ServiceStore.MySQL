@@ -33,6 +33,28 @@ public class TransactionController : ControllerBase
         return result;
     }
 
+    [HttpPost("/transaction/updateStatus")]
+    public async Task<ActionResult> UpdateTransactionStatus(int id, string status)
+    {
+        if (!TransactionExist(id))
+        {
+            return NotFound();
+        }
+        var transaction = new Transaction{Id = id};
+        transaction.PaymentStatus = status;
+        _context.Entry(transaction).Property("PaymentStatus").IsModified = true;
+        await _context.SaveChangesAsync();
+        var response = new
+        {
+            meta = new
+            {
+                message = "Transaction Update Success",
+                code = 200,
+                status = "success"
+            }
+        };
+        return Ok(response);
+    }
     [HttpPut("{id}")]
     public async Task<ActionResult> PutTransaction(int id, Transaction transaction)
     {
@@ -107,7 +129,7 @@ public class TransactionController : ControllerBase
         }
         DateTime date = DateTime.Now;
         string dateFinal = date.ToString("dd/M/yyyy");
-        var result = new
+        var response = new
         {
             meta = new
             {
@@ -129,7 +151,34 @@ public class TransactionController : ControllerBase
                 payment_status = transaction.PaymentStatus
             }
         };
-        return Ok(result);
+        return Ok(response);
+
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteTransaction(int id)
+    {
+        var transaction = await _context.Transactions.FindAsync(id);
+        if (transaction == null)
+        {
+            return NotFound();
+        }
+
+        _context.Transactions.Remove(transaction);
+        await _context.SaveChangesAsync();
+
+        var response = new
+        {
+            meta = new
+            {
+                message = "Transaction Delete Success",
+                code = 200,
+                status = "success"
+            }
+        };
+
+        return Ok(response);
+
 
     }
 
