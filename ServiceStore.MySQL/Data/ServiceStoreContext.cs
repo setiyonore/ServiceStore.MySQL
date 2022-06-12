@@ -19,6 +19,7 @@ namespace ServiceStore.Data
 
         public virtual DbSet<Invoice> Invoices { get; set; } = null!;
         public virtual DbSet<Transaction> Transactions { get; set; } = null!;
+        public virtual DbSet<TransactionDetail> TransactionDetails { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -101,6 +102,19 @@ namespace ServiceStore.Data
                 entity.Property(e => e.TotalPrice).HasColumnName("total_price");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
+            });
+
+            modelBuilder.Entity<TransactionDetail>(entity =>
+            {
+                entity.ToTable("transaction_details");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.IdTransaction).HasColumnName("id_transaction");
+
+                entity.Property(e => e.ProductId).HasColumnName("product_id");
+
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -33,7 +33,7 @@ public class TransactionController : ControllerBase
         return result;
     }
 
-    [HttpPost("/transaction/updateStatus")]
+    [HttpPost("updateStatus")]
     public async Task<ActionResult> UpdateTransactionStatus(int id, string status)
     {
         if (!TransactionExist(id))
@@ -104,7 +104,7 @@ public class TransactionController : ControllerBase
         return noInvoice;
 
     }
-    [HttpPost("/checkout/send")]
+    [HttpPost("checkout/send")]
     public async Task<ActionResult>PostTransactions(Checkout.products checkout)
     {
         
@@ -121,6 +121,22 @@ public class TransactionController : ControllerBase
         data.UserId = 4;
         _context.Transactions.Add(data);
         await _context.SaveChangesAsync();
+        //insert into transaction detil
+        var itm = checkout.Products.ToList();
+        //TransactionDetail item = new TransactionDetail();
+        for (int i = 0; i < itm.Count; i++)
+        {
+            //item.Quantity = checkout.Products[i].quantity;
+            //item.IdTransaction = data.Id;
+            //item.ProductId = checkout.Products[i].product_id;
+            _context.TransactionDetails.Add(new TransactionDetail()
+            {
+                IdTransaction = data.Id,
+                Quantity = checkout.Products[i].quantity,
+                ProductId = checkout.Products[i].product_id
+            });
+            _context.SaveChanges();
+        }
         //get data transaction
         var transaction = await _context.Transactions.FindAsync(data.Id);
         if (transaction == null)
@@ -154,7 +170,6 @@ public class TransactionController : ControllerBase
         return Ok(response);
 
     }
-
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteTransaction(int id)
     {
