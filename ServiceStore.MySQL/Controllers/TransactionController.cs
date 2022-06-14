@@ -123,12 +123,8 @@ public class TransactionController : ControllerBase
         await _context.SaveChangesAsync();
         //insert into transaction detil
         var itm = checkout.Products.ToList();
-        //TransactionDetail item = new TransactionDetail();
         for (int i = 0; i < itm.Count; i++)
         {
-            //item.Quantity = checkout.Products[i].quantity;
-            //item.IdTransaction = data.Id;
-            //item.ProductId = checkout.Products[i].product_id;
             _context.TransactionDetails.Add(new TransactionDetail()
             {
                 IdTransaction = data.Id,
@@ -195,6 +191,45 @@ public class TransactionController : ControllerBase
         return Ok(response);
 
 
+    }
+
+    [HttpGet("detil")]
+    public async Task<IActionResult> TransactionDetil(int Id)
+    {
+        var transaction = _context.Transactions.Find(Id);
+        var item = _context.TransactionDetails.Where(i => i.IdTransaction == Id)
+            .Select(detail => new
+            {
+                id_product = detail.ProductId,
+                product_price = 50000,
+                qty = detail.Quantity
+            }).ToList();
+        if (transaction == null)
+        {
+            return NotFound();
+        }
+        var response = new
+        {
+            meta = new
+            {
+              message = "Success",
+              code = 200,
+              status = "success"
+            },
+            data = new
+            {
+                user_id = transaction.UserId,
+                products = item,
+                invoice_code = transaction.InvoiceCode,
+                shipping_cost = transaction.ShippingCost,
+                total_price = transaction.TotalPrice,
+                shipping_address = transaction.ShippingAddress,
+                province_id = transaction.ProvinceId,
+                city_id = transaction.CityId,
+                payment_status = transaction.PaymentStatus
+            }
+        };
+        return Ok(response);
     }
 
     private bool TransactionExist(int id)
