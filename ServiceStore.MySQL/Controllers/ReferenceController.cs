@@ -53,5 +53,29 @@ namespace ServiceStore.MySQL.Controllers
             return Ok(costList);
         }
 
+        [HttpGet("getProvinceId")]
+        public async Task<IActionResult> GetProvinceId(int Id)
+        {
+            var _client = new RestClient("https://api.rajaongkir.com/starter");
+            var request = new RestRequest("/province?id="+Id);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
+            var response = await _client.ExecuteGetAsync(request);
+            var provinceList = JsonConvert.DeserializeObject<ProvinceId>(response.Content);
+            return Ok(provinceList);
+        }
+
+        [HttpGet("getCityId")]
+        public async Task<IActionResult> GetCityId(string ProvinceId, string CityId)
+        {
+            var _client = new RestClient("https://api.rajaongkir.com/starter");
+            var request = new RestRequest("/city?id="+CityId+"&province="+ProvinceId);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
+            var response = await _client.ExecuteGetAsync(request);
+            var cityList = JsonConvert.DeserializeObject<CityId>(response.Content);
+            return Ok(cityList);
+        }
+
     }
 }
