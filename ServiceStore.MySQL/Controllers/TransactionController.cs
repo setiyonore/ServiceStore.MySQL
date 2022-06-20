@@ -140,6 +140,13 @@ public class TransactionController : ControllerBase
         {
             return NotFound();
         }
+        var _client = new RestClient("https://api.rajaongkir.com/starter");
+        //city and province
+        var Request = new RestRequest("/city?id="+transaction.CityId+"&province="+transaction.ProvinceId);
+        Request.AddHeader("Content-Type", "application/json");
+        Request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
+        var Rest = await _client.ExecuteGetAsync(Request);
+        var Geo = JsonConvert.DeserializeObject<CityId>(Rest.Content);
         DateTime date = DateTime.Now;
         string dateFinal = date.ToString("dd/M/yyyy");
         var response = new
@@ -159,8 +166,8 @@ public class TransactionController : ControllerBase
                 amount_products_price = transaction.AmountProductsPrice,
                 total_price = transaction.TotalPrice,
                 shipping_address = transaction.ShippingAddress,
-                province_id = transaction.ProvinceId,
-                city_id = transaction.CityId,
+                province = Geo.rajaongkir.results.province,
+                city = Geo.rajaongkir.results.city_name,
                 payment_status = transaction.PaymentStatus
             }
         };
@@ -211,18 +218,11 @@ public class TransactionController : ControllerBase
         }
         //get privince and city
         var _client = new RestClient("https://api.rajaongkir.com/starter");
-        //province
-        var RequestProvince = new RestRequest("/province?id="+transaction.ProvinceId);
-        RequestProvince.AddHeader("Content-Type", "application/json");
-        RequestProvince.AddHeader("key", "81597abf054554a561654e6d89fb5799");
-        var RestProvince = await _client.ExecuteGetAsync(RequestProvince);
-        var Province = JsonConvert.DeserializeObject<ProvinceId>(RestProvince.Content);
-        //city
-        var RequestCity = new RestRequest("/city?id="+transaction.CityId+"&province="+transaction.ProvinceId);
-        RequestCity.AddHeader("Content-Type", "application/json");
-        RequestCity.AddHeader("key", "81597abf054554a561654e6d89fb5799");
-        var RestCity = await _client.ExecuteGetAsync(RequestCity);
-        var City = JsonConvert.DeserializeObject<CityId>(RestCity.Content);
+        var Request = new RestRequest("/city?id="+transaction.CityId+"&province="+transaction.ProvinceId);
+        Request.AddHeader("Content-Type", "application/json");
+        Request.AddHeader("key", "81597abf054554a561654e6d89fb5799");
+        var Rest = await _client.ExecuteGetAsync(Request);
+        var Geo = JsonConvert.DeserializeObject<CityId>(Rest.Content);
         var response = new
         {
             meta = new
@@ -239,8 +239,8 @@ public class TransactionController : ControllerBase
                 shipping_cost = transaction.ShippingCost,
                 total_price = transaction.TotalPrice,
                 shipping_address = transaction.ShippingAddress,
-                province = Province.RajaOngkir.Results.province,
-                city = City.rajaongkir.results.city_name,
+                province = Geo.rajaongkir.results.province,
+                city = Geo.rajaongkir.results.city_name,
                 payment_status = transaction.PaymentStatus
             }
         };
